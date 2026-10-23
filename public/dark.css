@@ -71,8 +71,15 @@ html[data-skin="dark"] .skill-pick[aria-current="true"] {
   box-shadow: inset 5px 0 0 #8eafd4;
   border-color: #8eafd4;
 }
-html[data-skin="dark"] .steps b,
 html[data-skin="dark"] .kicker .step { background: #e7eef6; color: #042e5e; }
+html[data-skin="dark"] .steps li.step-pick { background: var(--soft); border-color: #8eafd4; }
+html[data-skin="dark"] .steps li.step-pick .step-icon { color: #d5e4f7; }
+html[data-skin="dark"] .steps li.step-pick b { background: #e7eef6; color: #042e5e; }
+html[data-skin="dark"] .steps li.step-mark { background: var(--paper); border-color: #8ee0b0; }
+html[data-skin="dark"] .steps li.step-mark .step-icon { color: #8ee0b0; }
+html[data-skin="dark"] .steps li.step-mark b { background: #8ee0b0; color: #042e5e; }
+html[data-skin="dark"] .steps li.step-start .step-icon { color: #f0c14a; }
+html[data-skin="dark"] .steps li.step-start b { background: #f0c14a; color: #1a1204; }
 html[data-skin="dark"] .jump { background: #e7eef6; color: #042e5e; border-color: #e7eef6; }
 html[data-skin="dark"] .step-num { background: #e7eef6; color: #042e5e; }
 html[data-skin="dark"] .teach-flag { color: #1a1204; }
