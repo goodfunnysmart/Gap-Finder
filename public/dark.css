@@ -1,0 +1,78 @@
+html[data-skin="dark"] {
+  color-scheme: dark;
+  --ink: #e7eef6;
+  --muted: #c5d4e8;
+  --accent: #d5e4f7;
+  --accent-solid: #042e5e;
+  --accent-press: #0a3d78;
+  --on-accent: #fff;
+  --line: #3d5f8a;
+  --paper: #122033;
+  --bg: #0b1422;
+  --soft: #163056;
+  --field: #0d1a2c;
+  --field-border: #8eafd4;
+  --focus: #f0c14a;
+  --ok: #d8ffea;
+  --ok-bg: #145c38;
+  --ok-line: #8ee0b0;
+  --sh: #ffe6c2;
+  --sh-bg: #6a4510;
+  --sh-line: #f0c27a;
+  --no: #ffd8d4;
+  --no-bg: #6e2c2c;
+  --no-line: #f0a8a2;
+  --warn-bg: #3a2f1b;
+  --warn-ink: #ffe7b0;
+  --warn-line: #e6c36a;
+  --shadow: 0 10px 30px #0006;
+  --masthead: #042e5e;
+  --masthead-ink: #e7eef6;
+  --credit-bg: #042e5e;
+  --credit-ink: #e7eef6;
+  --bar-rest: #2c4a70;
+}
+html[data-skin="dark"] body {
+  background: radial-gradient(ellipse at 95% 0%, #1a3d6e55, transparent 42%), var(--bg);
+}
+html[data-skin="dark"] .logo-classic { display: none; }
+html[data-skin="dark"] .logo-dark { display: block; }
+html[data-skin="dark"] h1 { color: var(--ink); }
+html[data-skin="dark"] .skin-switch { background: #021c3d; border-color: #8eafd4; }
+html[data-skin="dark"] .skin-switch button { color: #e7eef6; }
+html[data-skin="dark"] .skin-switch button[aria-pressed="true"] {
+  background: #e7eef6;
+  color: #042e5e;
+}
+html[data-skin="dark"] .primary {
+  border-color: #8eafd4;
+}
+html[data-skin="dark"] .secondary,
+html[data-skin="dark"] .student-add button,
+html[data-skin="dark"] .button,
+html[data-skin="dark"] .text-button,
+html[data-skin="dark"] .credit-bar a,
+html[data-skin="dark"] summary,
+html[data-skin="dark"] a { color: var(--accent); }
+html[data-skin="dark"] .secondary,
+html[data-skin="dark"] .student-add button,
+html[data-skin="dark"] .button {
+  background: #15283d;
+  border-color: #8eafd4;
+}
+html[data-skin="dark"] .roster button[aria-pressed="true"],
+html[data-skin="dark"] .subject-chip[aria-pressed="true"] {
+  background: #e7eef6;
+  color: #042e5e;
+  border-color: #e7eef6;
+}
+html[data-skin="dark"] .subject-card[aria-pressed="true"] { box-shadow: inset 5px 0 0 #8eafd4; }
+html[data-skin="dark"] .badge { background: #0d1a2c; color: #d5e4f7; }
+html[data-skin="dark"] .st button[aria-pressed="true"][data-s="s"] { color: #042e5e; background: #b7ebcf; }
+html[data-skin="dark"] .st button[aria-pressed="true"][data-s="h"] { color: #3a2508; background: #f3d2a2; }
+html[data-skin="dark"] .st button[aria-pressed="true"][data-s="n"] { color: #3a1210; background: #f5c2bc; }
+html[data-skin="dark"] .credit-bar { border-top-color: #8eafd4; }
+html[data-skin="dark"] .credit-bar a { color: #fff; }
+@media (prefers-contrast: more) {
+  html[data-skin="dark"] { --muted: #e7eef6; --line: #c5d7ef; --field-border: #e7eef6; }
+}

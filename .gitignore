@@ -1,0 +1,19 @@
+# Private local configuration. The example, with the public default address, is versioned.
+/private/config.php
+/private/config.*.php
+!/private/config.example.php
+
+# Rate-limit timestamps only. Created on the server, never deployed from Git.
+/private/throttle/
+
+# Written on the server at deploy time. It only stores a directory path.
+/public/private-path.php
+
+.env
+.env.*
+*.log
+/.vscode/
+/.idea/
+.DS_Store
+__pycache__/
+*.py[cod]

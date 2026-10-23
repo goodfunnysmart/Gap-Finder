@@ -1,0 +1,11 @@
+---
+# Deploy HEAD Commit runs this from the Git clone, which must stay outside the document root.
+# deploy/cpanel-deploy.sh uses $HOME and SITE_ROOT. It does not contain the cPanel username.
+# SITE_ROOT defaults to $HOME/betterschools.com.au.
+# It copies public/ into $SITE_ROOT/gap-finder and private application files
+# into $HOME/gap-finder-private. It does not copy or delete config.php.
+# It rewrites .htaccess only by joining public/.htaccess with the existing
+# cPanel Directory Privacy block (the lines marked cp:ppd).
+deployment:
+  tasks:
+    - /bin/bash deploy/cpanel-deploy.sh
