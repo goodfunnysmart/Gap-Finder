@@ -1,128 +1,168 @@
 <!DOCTYPE html>
-<html lang="en-AU"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gap finder: where to start teaching</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#eef3f5;--surf:#fff;--ink:#17252f;--mute:#5a6b77;--line:#d3dde3;--acc:#0b6b73;--accbg:#d9eef0;
---ok:#1f7a45;--okbg:#dff1e5;--sh:#9a5b00;--shbg:#fbecd0;--no:#a63a52;--nobg:#f8dfe5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111c22;--surf:#192830;--ink:#e6eef2;--mute:#97aab6;--line:#2c4049;--acc:#6fd0d8;--accbg:#173a40;--ok:#7fd49d;--okbg:#17372381;--sh:#f0b865;--shbg:#3d2f13;--no:#f08aa0;--nobg:#401c27}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#111c22;--surf:#192830;--ink:#e6eef2;--mute:#97aab6;--line:#2c4049;--acc:#6fd0d8;--accbg:#173a40;--ok:#7fd49d;--okbg:#173723;--sh:#f0b865;--shbg:#3d2f13;--no:#f08aa0;--nobg:#401c27}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*,*:before,*:after{box-sizing:inherit}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 Lexend,"Segoe UI",system-ui,sans-serif;letter-spacing:.01em}
-.wrap{max-width:1100px;margin:0 auto;padding:28px 18px 60px}
-h1{font-size:2rem;line-height:1.2;margin:0 0 6px;font-weight:600}
-.sub{color:var(--mute);margin:0 0 22px;max-width:62ch}
-.ctl{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:12px}
-label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:4px}
-input,select{width:100%;font:inherit;padding:11px 12px;border:2px solid var(--line);border-radius:8px;background:var(--surf);color:var(--ink)}
-:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-.find{display:grid;grid-template-columns:1fr 3fr;gap:14px;position:relative}
-.res{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surf);border:2px solid var(--line);border-radius:8px;margin-top:4px;max-height:320px;overflow:auto;display:none}
-.res button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;padding:10px 12px;color:var(--ink);cursor:pointer;border-bottom:1px solid var(--line)}
-.res button:hover,.res button:focus-visible{background:var(--accbg)}
-.res small{color:var(--mute)}
-.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;margin-top:26px;align-items:start}
-.panel{background:var(--surf);border:2px solid var(--acc);border-radius:12px;padding:18px 20px;position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
-.panel h2{margin:0 0 4px;font-size:1.15rem}.panel h3{font-size:1rem;margin:16px 0 6px}
-.panel p{margin:4px 0}
-.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:10px 0 4px}
-.bar i{display:block;height:100%;background:var(--ok)}
-.mini{border-top:1px solid var(--line);padding:10px 0}
-.mini b{display:block}
-.ask{background:var(--accbg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.92rem}
-ol.path{list-style:none;margin:0;padding:0}
-.row{background:var(--surf);border:1px solid var(--line);border-left:8px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
-.row.s{border-left-color:var(--ok)}.row.h{border-left-color:var(--sh)}.row.n{border-left-color:var(--no)}
-.row.tgt{border-color:var(--acc);border-left-color:var(--acc);border-width:2px;border-left-width:8px}
-.top{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:baseline}
-.nm{font-weight:600}.meta{color:var(--mute);font-size:.82rem}
-.st{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.st button{font:inherit;font-size:.85rem;padding:6px 11px;border-radius:20px;border:2px solid var(--line);background:var(--surf);color:var(--ink);cursor:pointer}
-.st button.on[data-s=s]{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:600}
-.st button.on[data-s=h]{background:var(--shbg);border-color:var(--sh);color:var(--sh);font-weight:600}
-.st button.on[data-s=n]{background:var(--nobg);border-color:var(--no);color:var(--no);font-weight:600}
-.st .all{border-style:dashed;color:var(--mute)}
-details{margin-top:8px;font-size:.92rem}summary{cursor:pointer;color:var(--acc)}
-details ul{margin:6px 0;padding-left:20px}
-.reason{color:var(--mute);font-size:.85rem}
-.link{background:none;border:0;color:var(--acc);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
-.empty{padding:30px;text-align:center;color:var(--mute);border:2px dashed var(--line);border-radius:12px}
-footer{margin-top:40px;color:var(--mute);font-size:.82rem;max-width:80ch}
-@media(max-width:820px){.ctl,.find,.grid{grid-template-columns:1fr}.panel{position:static;order:-1}h1{font-size:1.6rem}}
-@media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
-</style></head><body><div class="wrap">
-<h1>Gap finder</h1>
-<p class="sub">Pick the skill a student is stuck on. This shows everything that sits underneath it. Mark what the student can and can’t do, and it points to the earliest gap worth teaching.</p>
-<div class="find"><div><label for="nm">Student first name (optional)</label><input id="nm" placeholder="e.g. Sam" autocomplete="off"></div>
-<div><label for="q">Skill the student is stuck on</label><input id="q" placeholder="Search maths, English, science… e.g. fractions" autocomplete="off"><div class="res" id="res"></div></div></div>
-<div class="grid"><div id="path"></div><aside class="panel" id="panel" aria-live="polite"></aside></div>
-<footer>Data: Marble Skill Taxonomy (v1) · © Generative Spark, Inc. (Marble) · withmarble.com · licensed under ODbL 1.0 (database) and CC BY-SA 4.0 (content). Ages are approximate and the taxonomy is not written for learners with additional needs, so treat the prerequisite links as a starting point and use your own professional judgement. Marks are saved only in this browser. Nothing is uploaded.</footer>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+  <title>Gap finder · Better Schools</title>
+  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="dark.css?v=1">
+  <link rel="preload" href="data/ma.json" as="fetch">
+  <link rel="preload" href="data/en.json" as="fetch">
+  <script src="theme-init.js?v=1"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to Gap finder</a>
+<header class="masthead">
+  <div class="masthead-bar">
+    <div class="brand">
+      <img class="logo logo-classic" src="assets/logo-classic.webp" width="692" height="168" alt="Better Schools">
+      <img class="logo logo-dark" src="assets/logo-dark.webp" width="692" height="168" alt="Better Schools">
+    </div>
+    <div class="masthead-tools">
+      <span class="tag">Where to start teaching</span>
+      <div class="skin-switch" role="group" aria-label="Appearance">
+        <button type="button" data-set-skin="classic" aria-pressed="true">Classic</button>
+        <button type="button" data-set-skin="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+  </div>
+</header>
+<p id="skin-status" class="sr-only" role="status"></p>
+<p id="live" class="sr-only" role="status"></p>
+<main id="main">
+  <p class="eyebrow">Where to start teaching</p>
+  <h1>Gap finder</h1>
+  <p class="lede">Pick the skill a student is stuck on. This shows the prerequisite path underneath it, from the foundations up to that skill. Mark what is secure, shaky, or not yet, and it points to the earliest gap worth teaching.</p>
+  <div class="notice" role="note"><strong>Starting point, not a diagnosis.</strong> Ages are approximate and the taxonomy is not written for learners with additional needs. Treat the links as a place to begin and use your professional judgement.</div>
+
+  <section class="panel" aria-labelledby="students-heading">
+    <div class="section-heading"><span class="step">01</span><h2 id="students-heading">Students in this browser</h2></div>
+    <p id="student-hint" class="help">Use a first name or initials only. Do not enter a surname, a class code, or a school. Marks stay in this browser and are not uploaded.</p>
+    <form id="student-form" autocomplete="off">
+      <label for="student-name">First name or initials</label>
+      <div class="student-add">
+        <input id="student-name" maxlength="24" autocomplete="off" autocapitalize="words" placeholder="e.g. Sam" aria-describedby="student-hint student-error">
+        <button id="add-student" type="submit">Add student</button>
+      </div>
+    </form>
+    <p id="student-error" class="form-error" role="status"></p>
+    <ul id="roster" class="roster"></ul>
+    <p id="active-label" class="help">Add a student before marking.</p>
+    <div class="toolbar">
+      <button id="rename-student" type="button" class="secondary" disabled>Rename</button>
+      <button id="remove-student" type="button" class="secondary" disabled>Remove</button>
+      <button id="export-backup" type="button" class="secondary" disabled>Export backup</button>
+      <button id="import-button" type="button" class="secondary">Import backup</button>
+      <input id="import-file" class="sr-only" type="file" accept="application/json,.json" tabindex="-1">
+    </div>
+    <p class="help">A backup is a JSON file on your computer. It includes the Marble credit. Nothing in it is sent to the server.</p>
+    <p id="save-warning" class="notice" hidden>This browser could not save marks. They will last only until you leave the page.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="find-heading">
+    <div class="section-heading"><span class="step">02</span><h2 id="find-heading">Choose a skill</h2></div>
+    <p class="subject-lead help">Mathematics and English are the recommended starting points because their prerequisite data is the strongest. The other subjects are here when you need them.</p>
+    <div id="subject-board" class="subject-board"></div>
+    <div id="subject-more" class="subject-more" role="group" aria-label="Other subjects"></div>
+    <p id="subject-status" role="status">Showing all subjects.</p>
+    <form id="search-form" class="find" role="search" autocomplete="off">
+      <label for="q">Skill the student is stuck on</label>
+      <input id="q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="results" placeholder="Search skills, for example fractions" autocomplete="off">
+      <div id="results" class="results" role="listbox" hidden></div>
+    </form>
+    <div id="starters" class="starters"></div>
+  </section>
+
+  <div class="workspace">
+    <section aria-labelledby="path-label">
+      <h2 id="path-label" class="sr-only">Prerequisite path</h2>
+      <div id="path"><div class="empty"><p>Loading the prerequisite path…</p></div></div>
+    </section>
+    <aside id="panel" class="panel side" aria-live="polite" aria-labelledby="where-heading">
+      <h2 id="where-heading">Where to start</h2>
+      <p>Loading skills.</p>
+    </aside>
+  </div>
+
+  <section class="panel" aria-labelledby="feedback-heading">
+    <div class="section-heading"><span class="step">03</span><h2 id="feedback-heading">Tell us what to improve</h2></div>
+    <p class="help">Use this for anything that is not a single prerequisite link. Each link also has its own “This link looks wrong” button. Do not name a student, a class, or a school. The note sends the comment, and your name and email only if you add them.</p>
+    <form id="general-form">
+      <label for="general-comment">Comment</label>
+      <textarea id="general-comment" maxlength="1500" required placeholder="What should we look at?"></textarea>
+      <div class="pair-fields">
+        <div>
+          <label for="general-teacher">Your name <span class="meta">optional</span></label>
+          <input id="general-teacher" maxlength="80" autocomplete="name" placeholder="So we can reply">
+        </div>
+        <div>
+          <label for="general-email">Your email <span class="meta">optional</span></label>
+          <input id="general-email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com">
+        </div>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for="general-company">Company website</label>
+        <input id="general-company" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="dialog-actions">
+        <button id="general-send" class="primary" type="submit">Send feedback</button>
+      </div>
+      <p id="general-status" class="help" role="status"></p>
+    </form>
+  </section>
+
+  <footer class="page-footer">
+    <p>Marble Skill Taxonomy (v1) · © Generative Spark, Inc. (Marble) · <a href="https://withmarble.com">withmarble.com</a> · Database licence ODbL 1.0 · Content licence CC BY-SA 4.0 · Source: <a href="https://github.com/withmarbleapp/os-taxonomy">github.com/withmarbleapp/os-taxonomy</a>. Curriculum standards referenced by the taxonomy have their own upstream licences (see PROVENANCE.md in that repository).</p>
+    <p>This is a starting point, not a diagnosis. Ages are approximate and the taxonomy is not written for learners with additional needs. Treat prerequisite links as a starting point and use professional judgement. Marks stay in this browser. Student names are not uploaded.</p>
+  </footer>
+</main>
+<div class="credit-bar">
+  <p><a href="https://withmarble.com">Marble Skill Taxonomy (v1)</a> · © Generative Spark, Inc. (Marble) · Database ODbL 1.0 · Content CC BY-SA 4.0 · <a href="https://github.com/withmarbleapp/os-taxonomy">Source repository</a> · Starting point, not a diagnosis</p>
 </div>
-<script id="data" type="application/json">__DATA__</script>
-<script>
-const raw=JSON.parse(document.getElementById('data').textContent);
-const T=new Map(raw.t.map(x=>[x.i,x])),pre=new Map();
-raw.e.forEach(([a,b,h,r])=>{if(!pre.has(a))pre.set(a,[]);pre.get(a).push({id:b,hard:h,reason:r})});
-const $=id=>document.getElementById(id);
-let target=raw.def,marks={};
-try{marks=JSON.parse(localStorage.getItem('gap:marks')||'{}')}catch(e){}
-const save=()=>{try{localStorage.setItem('gap:marks',JSON.stringify(marks))}catch(e){}};
-const P=id=>(pre.get(id)||[]).filter(p=>T.has(p.id));
-const lvMemo=new Map();
-function lv(id){if(lvMemo.has(id))return lvMemo.get(id);const p=P(id);const v=p.length?1+Math.max(...p.map(x=>lv(x.id))):0;lvMemo.set(id,v);return v}
-const ancMemo=new Map();
-function anc(id){if(ancMemo.has(id))return ancMemo.get(id);const s=new Set();P(id).forEach(p=>{s.add(p.id);anc(p.id).forEach(x=>s.add(x))});ancMemo.set(id,s);return s}
-const st=id=>marks[id]||'u';
-const name=()=>$('nm').value.trim()||'the student';
-const fill=t=>(t||'').replace(/\{\{name\}\}/g,name());
-const age=t=>t.a===t.b?`age ${t.a}`:`ages ${t.a}–${t.b}`;
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function render(){
- const t0=T.get(target);if(!t0){return}
- const ids=[...anc(target)];
- ids.sort((x,y)=>lv(x)-lv(y)||T.get(x).a-T.get(y).a||T.get(x).n.localeCompare(T.get(y).n));
- ids.push(target);
- const done=ids.filter(i=>st(i)==='s').length;
- const gaps=new Set();ids.forEach(i=>{if(st(i)==='h'||st(i)==='n'){gaps.add(i);anc(i).forEach(x=>gaps.add(x))}});
- const allSecure=i=>P(i).every(p=>st(p.id)==='s');
- const teach=ids.filter(i=>(st(i)==='h'||st(i)==='n')&&allSecure(i));
- const hasGap=ids.some(i=>st(i)==='h'||st(i)==='n');
- const check=ids.filter(i=>st(i)==='u'&&allSecure(i)&&(!hasGap||gaps.has(i))&&i!==target).sort((x,y)=>T.get(y).c-T.get(x).c).slice(0,4);
- const mini=(i,ask)=>{const t=T.get(i);return `<div class="mini"><b>${esc(t.n)}</b><span class="meta">${esc(t.d)} · ${age(t)}</span>${ask?`<div class="ask">${esc(fill(t.p))}</div>`:`<details><summary>What mastery looks like</summary><ul>${t.e.map(e=>`<li>${esc(e)}</li>`).join('')}</ul></details>`}</div>`};
- let h=`<h2>${st(target)==='s'?'Target is secure':'Where to start'}</h2><div class="bar"><i style="width:${done/ids.length*100}%"></i></div><p class="meta">${done} of ${ids.length} skills marked secure</p>`;
- if(st(target)==='s')h+=`<p>Nothing to fill in here. Pick a harder skill above.</p>`;
- else{
-  if(teach.length)h+=`<h3>Teach next</h3><p class="meta">These are the earliest gaps. Everything below them is secure.</p>`+teach.slice(0,3).map(i=>mini(i,false)).join('');
-  if(check.length)h+=`<h3>${hasGap?'Check these first':'Check these to begin'}</h3><p class="meta">${hasGap?'These sit below a gap and haven’t been checked yet.':'Start from the foundations and work up. Ask:'}</p>`+check.map(i=>mini(i,true)).join('');
-  if(!teach.length&&!check.length)h+=`<p>Mark more skills in the list to see a suggestion.</p>`;
- }
- $('panel').innerHTML=h;
- $('path').innerHTML=`<p class="meta" style="margin-top:0">Foundations first, target last. ${ids.length-1} skills sit beneath <b>${esc(t0.n)}</b>.</p><ol class="path">`+ids.map(i=>{const t=T.get(i),s=st(i);
-  const ps=P(i).map(p=>`<li>${esc(T.get(p.id).n)} <span class="reason">(${p.hard?'essential':'helpful'}: ${esc(p.reason||'')})</span></li>`).join('');
-  return `<li class="row ${s}${i===target?' tgt':''}" data-id="${i}"><div class="top"><span class="nm">${esc(t.n)}</span><span class="meta">${esc(t.d)} · ${age(t)}</span></div>
-  <details><summary>Details and check question</summary><p>${esc(t.ds)}</p><ul>${t.e.map(e=>`<li>${esc(e)}</li>`).join('')}</ul><div class="ask">${esc(fill(t.p))}</div>${ps?`<p><b>Needs first:</b></p><ul>${ps}</ul>`:''}</details>
-  <div class="st" role="group" aria-label="Status for ${esc(t.n)}">${[['s','Secure'],['h','Shaky'],['n','Not yet']].map(([k,l])=>`<button data-s="${k}" class="${s===k?'on':''}" aria-pressed="${s===k}">${l}</button>`).join('')}${anc(i).size?`<button class="all" data-s="all">Secure, and all below</button>`:''}</div></li>`}).join('')+`</ol><p><button class="link" id="clr">Clear all marks</button></p>`;
-}
-$('path').addEventListener('click',e=>{
- const b=e.target.closest('button');if(!b)return;
- if(b.id==='clr'){marks={};save();render();return}
- const li=b.closest('li');if(!li)return;const id=li.dataset.id,k=b.dataset.s;
- if(k==='all'){marks[id]='s';anc(id).forEach(x=>marks[x]='s')}
- else if(marks[id]===k)delete marks[id];else marks[id]=k;
- save();const y=scrollY;render();scrollTo(0,y);
-});
-$('nm').addEventListener('input',render);
-const q=$('q'),res=$('res');
-q.addEventListener('input',()=>{
- const v=q.value.trim().toLowerCase();if(v.length<2){res.style.display='none';return}
- const m=raw.t.filter(t=>(t.n+' '+t.d).toLowerCase().includes(v)&&anc(t.i).size>0).sort((x,y)=>(y.n.toLowerCase().startsWith(v)-x.n.toLowerCase().startsWith(v))||y.c-x.c).slice(0,10);
- res.innerHTML=m.length?m.map(t=>`<button data-id="${t.i}">${esc(t.n)} <small>${esc(t.s)} · ${esc(t.d)} · ${age(t)}</small></button>`).join(''):'<button disabled>No match</button>';
- res.style.display='block';
-});
-res.addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b)return;target=b.dataset.id;q.value=T.get(target).n;res.style.display='none';render();scrollTo(0,0)});
-document.addEventListener('click',e=>{if(!e.target.closest('.find'))res.style.display='none'});
-q.value=T.get(target).n;render();
-</script></body></html>
+
+<dialog id="link-dialog" class="dialog" aria-labelledby="link-title">
+  <h2 id="link-title">This link looks wrong</h2>
+  <p id="link-what"></p>
+  <form id="link-form">
+    <label for="link-comment">What looks wrong?</label>
+    <textarea id="link-comment" maxlength="1500" required></textarea>
+    <div class="pair-fields">
+      <div>
+        <label for="link-teacher">Your name <span class="meta">optional</span></label>
+        <input id="link-teacher" maxlength="80" autocomplete="name">
+      </div>
+      <div>
+        <label for="link-email">Your email <span class="meta">optional</span></label>
+        <input id="link-email" type="email" maxlength="254" autocomplete="email">
+      </div>
+    </div>
+    <p class="help">Do not name a student, a class, or a school. The note includes the two skill names and ids, the link, your comment, and your contact details only if you add them.</p>
+    <div class="hp" aria-hidden="true">
+      <label for="link-company">Company website</label>
+      <input id="link-company" tabindex="-1" autocomplete="off">
+    </div>
+    <div class="dialog-actions">
+      <button id="link-send" class="primary" type="submit">Send feedback</button>
+      <button id="link-cancel" class="secondary" type="button">Cancel</button>
+    </div>
+    <p id="link-status" class="help" role="status"></p>
+  </form>
+</dialog>
+
+<dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title">
+  <h2 id="confirm-title">Please confirm</h2>
+  <p id="confirm-text"></p>
+  <div class="dialog-actions">
+    <button id="confirm-yes" class="primary" type="button">Continue</button>
+    <button id="confirm-no" class="secondary" type="button">Cancel</button>
+  </div>
+</dialog>
+
+<noscript><p class="notice">JavaScript is required to search skills and save marks in this browser.</p></noscript>
+<script id="catalog" type="application/json">__CATALOG__</script>
+<script src="skin.js?v=1" defer></script>
+<script src="app.js?v=1" defer></script>
+</body>
+</html>
