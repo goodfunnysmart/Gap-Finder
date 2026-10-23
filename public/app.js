@@ -300,12 +300,16 @@ function renderPath() {
   ancMemo.clear();
   const skill = topics.get(target);
   const ids = [...anc(target)];
+  // Foundations first: shortest prerequisite chain, then younger age, then name. Target last.
+  // Teach next and Check these first use this same order.
   ids.sort((a, b) => lv(a) - lv(b) || topics.get(a).a - topics.get(b).a || topics.get(a).n.localeCompare(topics.get(b).n));
   ids.push(target);
+  const { teach } = suggestions(ids);
+  const teachSet = new Set(teach);
   const linksInline = ids.length <= 45;
   const counts = { s: 0, h: 0, n: 0, u: 0 };
   ids.forEach((id) => { counts[st(id)] += 1; });
-  const rows = ids.map((id) => {
+  const rows = ids.map((id, index) => {
     const topic = topics.get(id);
     const mark = st(id);
     const priors = P(id);
@@ -316,8 +320,9 @@ function renderPath() {
         : `<details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Needs first (${priors.length})</summary><ul class="prereqs">${linkHtml}</ul></details>`)
       : '';
     const below = anc(id).size ? '<button type="button" class="all" data-s="all">Secure, and all below</button>' : '';
-    return `<li class="row ${mark}${id === target ? ' tgt' : ''}" data-id="${esc(id)}">
-      <div class="top"><span class="nm">${id === target ? '<span class="target-flag">Target</span>' : ''}${esc(topic.n)}</span><span class="meta">${esc(topic.s)} · ${esc(topic.d)} · ${esc(age(topic))}</span></div>
+    const teachNext = teachSet.has(id);
+    return `<li class="row ${mark}${id === target ? ' tgt' : ''}${teachNext ? ' teach-next' : ''}" data-id="${esc(id)}">
+      <div class="top"><span class="nm"><span class="step-num">${index + 1}</span>${teachNext ? '<span class="teach-flag">Teach next</span>' : ''}${id === target ? '<span class="target-flag">Target</span>' : ''}${esc(topic.n)}</span><span class="meta">${esc(topic.s)} · ${esc(topic.d)} · ${esc(age(topic))}</span></div>
       <p class="status-word">${STATUS[mark]}</p>
       <div class="st" role="group" aria-label="Status for ${esc(topic.n)}">${[['s', 'Secure'], ['h', 'Shaky'], ['n', 'Not yet']].map(([key, label]) => `<button type="button" data-s="${key}" aria-pressed="${mark === key}">${label}</button>`).join('')}${below}</div>
       <details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Check question</summary>
@@ -330,7 +335,7 @@ function renderPath() {
   }).join('');
   $('path').innerHTML = `<p class="kicker"><span class="step">2</span> Mark what they can do</p>
     <h2 id="path-heading" tabindex="-1">${esc(skill.n)}</h2>
-    <p class="path-intro">${ids.length - 1} skills underneath</p>
+    <p class="path-intro">${ids.length} steps · foundations first, target last</p>
     <ul class="legend"><li><span class="swatch s" aria-hidden="true"></span> Secure</li><li><span class="swatch h" aria-hidden="true"></span> Shaky</li><li><span class="swatch n" aria-hidden="true"></span> Not yet</li><li><span class="swatch" aria-hidden="true"></span> Not marked</li></ul>
     <ol class="path">${rows}</ol>
     <p><button id="clear-marks" type="button" class="text-button">Clear all marks${active() ? ` for ${esc(active().name)}` : ''}</button></p>`;
@@ -345,8 +350,7 @@ function renderPath() {
     if (button) button.focus({ preventScroll: true });
   }
 }
-function renderPanel(ids, counts) {
-  const done = counts.s;
+function suggestions(ids) {
   const gaps = new Set();
   ids.forEach((id) => {
     if (st(id) === 'h' || st(id) === 'n') {
@@ -354,19 +358,23 @@ function renderPanel(ids, counts) {
       anc(id).forEach((next) => gaps.add(next));
     }
   });
-  const allSecure = (id) => P(id).every((item) => st(item.id) === 's');
-  const teach = ids.filter((id) => (st(id) === 'h' || st(id) === 'n') && allSecure(id));
+  const ready = (id) => P(id).every((item) => st(item.id) === 's');
   const hasGap = ids.some((id) => st(id) === 'h' || st(id) === 'n');
-  const check = ids.filter((id) => st(id) === 'u' && allSecure(id) && (!hasGap || gaps.has(id)) && id !== target)
-    .sort((a, b) => topics.get(b).c - topics.get(a).c)
-    .slice(0, 4);
+  const teach = ids.filter((id) => (st(id) === 'h' || st(id) === 'n') && ready(id)).slice(0, 3);
+  const check = ids.filter((id) => st(id) === 'u' && ready(id) && (!hasGap || gaps.has(id)) && id !== target).slice(0, 4);
+  return { teach, check, hasGap };
+}
+function renderPanel(ids, counts) {
+  const done = counts.s;
+  const { teach, check, hasGap } = suggestions(ids);
   const card = (id) => {
     const topic = topics.get(id);
     const mark = st(id);
+    const step = ids.indexOf(id) + 1;
     const marks = [['s', 'Secure'], ['h', 'Shaky'], ['n', 'Not yet']].map(([key, label]) => (
       `<button type="button" data-mark="${key}" data-id="${esc(id)}" aria-pressed="${mark === key}">${label}</button>`
     )).join('');
-    return `<article class="suggest"><h4>${esc(topic.n)}</h4><p class="meta">${esc(topic.d)} · ${esc(age(topic))}</p>
+    return `<article class="suggest"><h4><span class="step-num">${step}</span> ${esc(topic.n)}</h4><p class="meta">${esc(topic.d)} · ${esc(age(topic))}</p>
       <div class="suggest-actions"><button type="button" class="jump" data-jump="${esc(id)}">Jump to it</button>
       <span class="mark-label">Mark it</span>
       <div class="st" role="group" aria-label="Mark it: ${esc(topic.n)}">${marks}</div></div></article>`;

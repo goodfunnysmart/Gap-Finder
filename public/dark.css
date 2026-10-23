@@ -74,6 +74,8 @@ html[data-skin="dark"] .skill-pick[aria-current="true"] {
 html[data-skin="dark"] .steps b,
 html[data-skin="dark"] .kicker .step { background: #e7eef6; color: #042e5e; }
 html[data-skin="dark"] .jump { background: #e7eef6; color: #042e5e; border-color: #e7eef6; }
+html[data-skin="dark"] .step-num { background: #e7eef6; color: #042e5e; }
+html[data-skin="dark"] .teach-flag { color: #1a1204; }
 html[data-skin="dark"] .info-wrap .tip { background: #e7eef6; color: #042e5e; }
 html[data-skin="dark"] .badge { background: #0d1a2c; color: #d5e4f7; }
 html[data-skin="dark"] .st button[aria-pressed="true"][data-s="s"],
