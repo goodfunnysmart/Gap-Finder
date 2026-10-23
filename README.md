@@ -15,7 +15,8 @@ Gap-Finder/
 │   └── cpanel-deploy.sh          # Copies site files; keeps config.php and Directory Privacy
 ├── public/                       ← Deployed to $HOME/betterschools.com.au/gap-finder
 │   ├── index.html                # Built page, with the skill catalog embedded
-│   ├── app.js                    # Search, paths, marks, backup, feedback
+│   ├── app.js                    # Skill list, paths, marks, backup, feedback
+│   ├── filter.js                 # Subject, domain, and age filtering for the skill list
 │   ├── app.css                   # Classic layout
 │   ├── dark.css                  # Dark palette
 │   ├── skin.js                   # Classic / Dark switch
@@ -54,7 +55,7 @@ A teacher adds a first name or initials. The page asks them not to enter a surna
 
 ## Feedback
 
-Each prerequisite has a **This link looks wrong** button. A general box sits at the bottom of the page. Both POST JSON to `feedback.php`. The message can include the skill ids and names, the link, the comment, and an optional teacher name and email. The endpoint checks the same origin, a CSRF token, a honeypot field, and a rate limit. It does not store the message. Mail is sent from `noreply@betterschools.com.au`.
+Each prerequisite has a speech-bubble icon labelled “This link looks wrong”. A feedback box sits at the bottom of the page. Both POST JSON to `feedback.php`. The message can include the skill ids and names, the link, the comment, and an optional teacher name and email. The endpoint checks the same origin, a CSRF token, a honeypot field, and a rate limit. It does not store the message. Mail is sent from `noreply@betterschools.com.au`.
 
 The recipient is `FEEDBACK_TO` in the private config. The example, and the default to copy onto the server, is the public address `info@betterschools.com.au`.
 
@@ -80,6 +81,7 @@ Open http://127.0.0.1:8765 . To try feedback locally, copy `private/config.examp
 ```bash
 python3 source/build.py
 python3 tests/path_check.py
+node tests/filter_check.js
 php tests/feedback_check.php
 bash tests/feedback_http.sh
 bash tests/deploy_check.sh
