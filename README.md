@@ -82,6 +82,7 @@ Open http://127.0.0.1:8765 . To try feedback locally, copy `private/config.examp
 python3 source/build.py
 python3 tests/path_check.py
 node tests/filter_check.js
+node tests/order_check.js
 php tests/feedback_check.php
 bash tests/feedback_http.sh
 bash tests/deploy_check.sh
