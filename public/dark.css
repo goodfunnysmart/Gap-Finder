@@ -66,11 +66,22 @@ html[data-skin="dark"] .subject-chip[aria-pressed="true"] {
   color: #042e5e;
   border-color: #e7eef6;
 }
-html[data-skin="dark"] .subject-card[aria-pressed="true"] { box-shadow: inset 5px 0 0 #8eafd4; }
+html[data-skin="dark"] .subject-chip[aria-pressed="true"] .badge { background: #042e5e; color: #e7eef6; }
+html[data-skin="dark"] .skill-pick[aria-current="true"] {
+  box-shadow: inset 5px 0 0 #8eafd4;
+  border-color: #8eafd4;
+}
+html[data-skin="dark"] .steps b,
+html[data-skin="dark"] .kicker .step { background: #e7eef6; color: #042e5e; }
+html[data-skin="dark"] .jump { background: #e7eef6; color: #042e5e; border-color: #e7eef6; }
+html[data-skin="dark"] .info-wrap .tip { background: #e7eef6; color: #042e5e; }
 html[data-skin="dark"] .badge { background: #0d1a2c; color: #d5e4f7; }
-html[data-skin="dark"] .st button[aria-pressed="true"][data-s="s"] { color: #042e5e; background: #b7ebcf; }
-html[data-skin="dark"] .st button[aria-pressed="true"][data-s="h"] { color: #3a2508; background: #f3d2a2; }
-html[data-skin="dark"] .st button[aria-pressed="true"][data-s="n"] { color: #3a1210; background: #f5c2bc; }
+html[data-skin="dark"] .st button[aria-pressed="true"][data-s="s"],
+html[data-skin="dark"] .st button[aria-pressed="true"][data-mark="s"] { color: #042e5e; background: #b7ebcf; }
+html[data-skin="dark"] .st button[aria-pressed="true"][data-s="h"],
+html[data-skin="dark"] .st button[aria-pressed="true"][data-mark="h"] { color: #3a2508; background: #f3d2a2; }
+html[data-skin="dark"] .st button[aria-pressed="true"][data-s="n"],
+html[data-skin="dark"] .st button[aria-pressed="true"][data-mark="n"] { color: #3a1210; background: #f5c2bc; }
 html[data-skin="dark"] .credit-bar { border-top-color: #8eafd4; }
 html[data-skin="dark"] .credit-bar a { color: #fff; }
 @media (prefers-contrast: more) {

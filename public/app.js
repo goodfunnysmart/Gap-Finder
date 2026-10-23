@@ -30,13 +30,16 @@ const STORE = 'gapfinder:students:v1';
 const TEACHER_KEY = 'gapfinder:teacher';
 const STATUS = { s: 'Marked secure', h: 'Marked shaky', n: 'Marked not yet', u: 'Not marked' };
 
+const FLAG_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 5.5h14v9H8.5L5 18.5V5.5z"/></svg>';
+
 let state = loadState();
 let target = byId.has(catalog.default) ? catalog.default : summaries.find((topic) => topic.mask)?.i;
 let subjectFilter = '';
+let domainFilter = '';
+let ageFilter = '';
 let renaming = false;
 let pathReady = false;
 let showRequest = 0;
-let activeOption = -1;
 let pendingLink = null;
 let csrfToken = '';
 
@@ -178,62 +181,92 @@ function anc(id, stack) {
   return found;
 }
 
+function listFilters(query) {
+  return {
+    subject: subjectFilter,
+    domain: domainFilter,
+    age: ageFilter,
+    query: query == null ? $('q').value : query
+  };
+}
 function renderSubjects() {
   const board = $('subject-board');
-  const more = $('subject-more');
   if (!board.childElementCount) {
     SUBJECTS.forEach((subject) => {
       const button = document.createElement('button');
       button.type = 'button';
+      button.className = 'subject-chip';
       button.dataset.subject = subject.c;
       button.setAttribute('aria-pressed', 'false');
-      if (subject.r) {
-        button.className = 'subject-card recommended';
-        button.innerHTML = `<span class="badge">Recommended start</span><span class="subject-name">${esc(subject.n)}</span><span class="subject-note">Strongest prerequisite data.</span>`;
-        board.appendChild(button);
-      } else {
-        button.className = 'subject-chip';
-        button.textContent = subject.n;
-        more.appendChild(button);
-      }
+      button.innerHTML = subject.r
+        ? `<span class="subject-name">${esc(subject.n)}</span><span class="badge">Start</span>`
+        : `<span class="subject-name">${esc(subject.n)}</span>`;
+      board.appendChild(button);
     });
   }
   document.querySelectorAll('[data-subject]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.subject === subjectFilter));
   });
-  const selected = subjectByCode.get(subjectFilter);
-  $('subject-status').textContent = selected
-    ? `Showing ${selected.n}${selected.r ? ', a recommended starting point' : ''}.`
-    : 'Showing all subjects. Mathematics and English are the recommended starting points.';
 }
-function renderStarters() {
-  const host = $('starters');
-  const query = $('q').value.trim().toLowerCase();
-  const selected = byId.get(target);
-  const searching = query.length >= 2 && (!selected || query !== selected.n.toLowerCase());
-  if (searching) {
-    host.hidden = true;
-    host.replaceChildren();
+function renderDomainOptions() {
+  const select = $('domain-filter');
+  const domains = domainsFor(summaries, SUBJECTS, subjectFilter);
+  if (domainFilter && !domains.includes(domainFilter)) domainFilter = '';
+  const current = domainFilter;
+  select.replaceChildren();
+  const any = document.createElement('option');
+  any.value = '';
+  any.textContent = 'All domains';
+  select.appendChild(any);
+  domains.forEach((domain) => {
+    const option = document.createElement('option');
+    option.value = domain;
+    option.textContent = domain;
+    select.appendChild(option);
+  });
+  select.value = current;
+}
+function renderAgeOptions() {
+  const select = $('age-filter');
+  select.title = 'Skills whose age range overlaps this band.';
+  if (select.childElementCount) return;
+  AGE_BANDS.forEach((band) => {
+    const option = document.createElement('option');
+    option.value = band.id;
+    option.textContent = band.label;
+    select.appendChild(option);
+  });
+}
+function renderSkillList() {
+  const result = filterSkills(summaries, SUBJECTS, listFilters(), 40, catalog.starters);
+  const host = $('skill-list');
+  const count = $('skill-count');
+  host.replaceChildren();
+  if (!result.total) {
+    count.textContent = 'No skills match.';
     return;
   }
-  host.hidden = false;
-  const codes = subjectFilter ? [subjectFilter] : ['ma', 'en'];
-  host.replaceChildren();
-  const label = document.createElement('p');
-  label.className = 'help';
-  label.textContent = 'Try one of these:';
-  host.appendChild(label);
-  codes.forEach((code) => {
-    (catalog.starters[code] || []).forEach((id) => {
-      const topic = byId.get(id);
-      if (!topic) return;
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.dataset.pick = id;
-      button.textContent = `${topic.n} · ${SUBJECTS[topic.si].n}`;
-      host.appendChild(button);
-    });
+  count.textContent = result.browsing
+    ? 'Suggested skills'
+    : (result.items.length === result.total ? `${result.total} skills` : `Showing ${result.items.length} of ${result.total}`);
+  result.items.forEach((topic) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'skill-pick';
+    button.dataset.pick = topic.i;
+    const current = topic.i === target;
+    button.setAttribute('aria-current', String(current));
+    button.innerHTML = `<span class="skill-name">${esc(topic.n)}</span><small>${esc(SUBJECTS[topic.si].n)} · ${esc(topic.d)} · ${esc(age(topic))}</small>`;
+    host.appendChild(button);
   });
+}
+function applyFilters(follow) {
+  if (follow) $('q').value = '';
+  renderSubjects();
+  renderDomainOptions();
+  const next = follow ? pickTarget(target, summaries, SUBJECTS, listFilters()) : target;
+  if (next !== target) choose(next, false);
+  else renderSkillList();
 }
 function renderRoster() {
   const student = active();
@@ -250,14 +283,17 @@ function prereqItem(skillId, skill, item) {
   const prior = topics.get(item.id);
   if (!prior) return '';
   const strength = item.hard ? 'essential' : 'helpful';
-  return `<li><b>${esc(prior.n)}</b> <span class="reason">${strength}: ${esc(item.reason || 'no reason recorded')}</span>
-    <button type="button" class="text-button wrong" data-topic-id="${esc(skillId)}" data-topic-name="${esc(skill.n)}" data-prereq-id="${esc(item.id)}" data-prereq-name="${esc(prior.n)}" data-strength="${item.hard ? 'hard' : 'helpful'}" data-reason="${esc(item.reason || '')}">This link looks wrong</button></li>`;
+  const label = `This link looks wrong: ${skill.n} needs ${prior.n}`;
+  return `<li class="prereq-card"><div class="prereq-body"><b>${esc(prior.n)}</b> <span class="reason">${strength}: ${esc(item.reason || 'no reason recorded')}</span></div>
+    <button type="button" class="flag wrong" title="This link looks wrong" aria-label="${esc(label)}" data-topic-id="${esc(skillId)}" data-topic-name="${esc(skill.n)}" data-prereq-id="${esc(item.id)}" data-prereq-name="${esc(prior.n)}" data-strength="${item.hard ? 'hard' : 'helpful'}" data-reason="${esc(item.reason || '')}">${FLAG_ICON}</button></li>`;
 }
 function renderPath() {
   if (!pathReady || !topics.has(target)) return;
   const open = new Set([...document.querySelectorAll('#path details[open]')].map((node) => node.dataset.for));
   const focused = document.activeElement;
-  const focusRow = focused && focused.closest ? focused.closest('[data-id]') : null;
+  const focusPanel = focused && focused.dataset && focused.dataset.mark ? focused.dataset.id : '';
+  const focusPanelMark = focusPanel ? focused.dataset.mark : '';
+  const focusRow = !focusPanel && focused && focused.closest ? focused.closest('[data-id]') : null;
   const focusMark = focused && focused.dataset ? focused.dataset.s || '' : '';
   const y = window.scrollY;
   lvMemo.clear();
@@ -276,15 +312,15 @@ function renderPath() {
     const linkHtml = priors.map((item) => prereqItem(id, topic, item)).join('');
     const links = linkHtml
       ? (linksInline
-        ? `<p><b>Needs first</b></p><ul class="prereqs">${linkHtml}</ul>`
-        : `<details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Prerequisite links (${priors.length})</summary><ul class="prereqs">${linkHtml}</ul></details>`)
+        ? `<p class="needs">Needs first</p><ul class="prereqs">${linkHtml}</ul>`
+        : `<details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Needs first (${priors.length})</summary><ul class="prereqs">${linkHtml}</ul></details>`)
       : '';
     const below = anc(id).size ? '<button type="button" class="all" data-s="all">Secure, and all below</button>' : '';
     return `<li class="row ${mark}${id === target ? ' tgt' : ''}" data-id="${esc(id)}">
       <div class="top"><span class="nm">${id === target ? '<span class="target-flag">Target</span>' : ''}${esc(topic.n)}</span><span class="meta">${esc(topic.s)} · ${esc(topic.d)} · ${esc(age(topic))}</span></div>
       <p class="status-word">${STATUS[mark]}</p>
       <div class="st" role="group" aria-label="Status for ${esc(topic.n)}">${[['s', 'Secure'], ['h', 'Shaky'], ['n', 'Not yet']].map(([key, label]) => `<button type="button" data-s="${key}" aria-pressed="${mark === key}">${label}</button>`).join('')}${below}</div>
-      <details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Check question and what mastery looks like</summary>
+      <details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Check question</summary>
         <p>${esc(topic.ds || '')}</p>
         <ul>${(topic.e || []).map((item) => `<li>${esc(item)}</li>`).join('')}</ul>
         <div class="ask">${esc(fill(topic.p))}</div>
@@ -292,14 +328,18 @@ function renderPath() {
       ${links}
     </li>`;
   }).join('');
-  $('path').innerHTML = `<h2 id="path-heading" tabindex="-1">${esc(skill.n)}</h2>
-    <p class="path-intro">Foundations first, target last. ${ids.length - 1} skills sit beneath this one.</p>
+  $('path').innerHTML = `<p class="kicker"><span class="step">2</span> Mark what they can do</p>
+    <h2 id="path-heading" tabindex="-1">${esc(skill.n)}</h2>
+    <p class="path-intro">${ids.length - 1} skills underneath</p>
     <ul class="legend"><li><span class="swatch s" aria-hidden="true"></span> Secure</li><li><span class="swatch h" aria-hidden="true"></span> Shaky</li><li><span class="swatch n" aria-hidden="true"></span> Not yet</li><li><span class="swatch" aria-hidden="true"></span> Not marked</li></ul>
     <ol class="path">${rows}</ol>
     <p><button id="clear-marks" type="button" class="text-button">Clear all marks${active() ? ` for ${esc(active().name)}` : ''}</button></p>`;
   renderPanel(ids, counts);
   window.scrollTo(0, y);
-  if (focusRow && focusMark) {
+  if (focusPanel && focusPanelMark) {
+    const button = document.querySelector(`#panel [data-id="${CSS.escape(focusPanel)}"][data-mark="${CSS.escape(focusPanelMark)}"]`);
+    if (button) button.focus({ preventScroll: true });
+  } else if (focusRow && focusMark) {
     const row = document.querySelector(`#path [data-id="${CSS.escape(focusRow.dataset.id)}"]`);
     const button = row && row.querySelector(`[data-s="${CSS.escape(focusMark)}"]`);
     if (button) button.focus({ preventScroll: true });
@@ -320,29 +360,44 @@ function renderPanel(ids, counts) {
   const check = ids.filter((id) => st(id) === 'u' && allSecure(id) && (!hasGap || gaps.has(id)) && id !== target)
     .sort((a, b) => topics.get(b).c - topics.get(a).c)
     .slice(0, 4);
-  const mini = (id, withAsk) => {
+  const card = (id) => {
     const topic = topics.get(id);
-    const extra = withAsk
-      ? `<div class="ask">${esc(fill(topic.p))}</div>`
-      : `<details><summary>What mastery looks like</summary><ul>${(topic.e || []).map((item) => `<li>${esc(item)}</li>`).join('')}</ul></details>`;
-    return `<div class="mini"><b>${esc(topic.n)}</b><span class="meta">${esc(topic.d)} · ${esc(age(topic))}</span>${extra}</div>`;
+    const mark = st(id);
+    const marks = [['s', 'Secure'], ['h', 'Shaky'], ['n', 'Not yet']].map(([key, label]) => (
+      `<button type="button" data-mark="${key}" data-id="${esc(id)}" aria-pressed="${mark === key}">${label}</button>`
+    )).join('');
+    return `<article class="suggest"><h4>${esc(topic.n)}</h4><p class="meta">${esc(topic.d)} · ${esc(age(topic))}</p>
+      <div class="suggest-actions"><button type="button" class="jump" data-jump="${esc(id)}">Jump to it</button>
+      <span class="mark-label">Mark it</span>
+      <div class="st" role="group" aria-label="Mark it: ${esc(topic.n)}">${marks}</div></div></article>`;
   };
   const seg = (count, name) => (count ? `<i class="seg ${name}" style="flex:${count}"></i>` : '');
-  const who = active() ? ` for ${esc(active().name)}` : '';
-  let html = `<h2 id="where-heading">${st(target) === 's' ? 'Target is secure' : 'Where to start'}${who}</h2>
-    <div class="bar" aria-hidden="true">${seg(counts.s, 'ok')}${seg(counts.h, 'sh')}${seg(counts.n, 'no')}${seg(counts.u, 'rest')}</div>
-    <p class="count-line">${done} of ${ids.length} skills marked secure. ${counts.h} shaky, ${counts.n} not yet, ${counts.u} not marked.</p>`;
+  const who = active() ? ` · ${esc(active().name)}` : '';
+  let html = `<p class="kicker"><span class="step">3</span> See where to start${who}</p>
+    <h2 id="where-heading">${st(target) === 's' ? 'Target is secure' : 'Where to start'}</h2>
+    <p class="count-line">${done} of ${ids.length} secure · ${counts.h} shaky · ${counts.n} not yet · ${counts.u} not marked</p>
+    <div class="bar" aria-hidden="true">${seg(counts.s, 'ok')}${seg(counts.h, 'sh')}${seg(counts.n, 'no')}${seg(counts.u, 'rest')}</div>`;
   if (st(target) === 's') {
-    html += '<p>Nothing to fill in here. Pick a harder skill above.</p>';
+    html += '<p>This skill is secure. Pick a harder one.</p>';
   } else if (teach.length) {
-    html += `<h3>Teach next</h3><p class="meta">These are the earliest gaps. Everything below them is secure.</p>${teach.slice(0, 3).map((id) => mini(id, false)).join('')}`;
-    if (check.length) html += `<h3>Check these first</h3><p class="meta">These sit below a gap and have not been checked yet.</p>${check.map((id) => mini(id, true)).join('')}`;
+    html += `<h3>Teach next</h3><p class="meta">Earliest gap. The skills under it are secure.</p>${teach.slice(0, 3).map(card).join('')}`;
+    if (check.length) html += `<h3>Check these first</h3><p class="meta">Not marked yet. Mark each one, or jump to it.</p>${check.map(card).join('')}`;
   } else if (check.length) {
-    html += `<h3>${hasGap ? 'Check these first' : 'Check these to begin'}</h3><p class="meta">${hasGap ? 'These sit below a gap and have not been checked yet.' : 'Start from the foundations and work up. Ask:'}</p>${check.map((id) => mini(id, true)).join('')}`;
+    html += `<h3>Check these first</h3><p class="meta">${hasGap ? 'Not marked yet, under a gap. Mark each one, or jump to it.' : 'Not marked yet. Start here, then mark each one.'}</p>${check.map(card).join('')}`;
   } else {
-    html += '<p>Mark more skills in the list to see a suggestion.</p>';
+    html += '<p>Mark skills on the left to see where to start.</p>';
   }
   $('panel').innerHTML = html;
+}
+function jumpTo(id) {
+  const row = document.querySelector(`#path li.row[data-id="${CSS.escape(id)}"]`);
+  if (!row) return;
+  row.classList.add('jumped');
+  row.scrollIntoView({ block: 'center', inline: 'nearest' });
+  const name = row.querySelector('.nm');
+  if (!name) return;
+  name.setAttribute('tabindex', '-1');
+  name.focus({ preventScroll: true });
 }
 
 async function showPath(moveFocus) {
@@ -389,57 +444,10 @@ function setMark(id, key) {
   renderPath();
 }
 
-function closeResults() {
-  $('results').hidden = true;
-  $('results').replaceChildren();
-  $('q').setAttribute('aria-expanded', 'false');
-  $('q').removeAttribute('aria-activedescendant');
-  activeOption = -1;
-}
-function renderResults(items) {
-  const box = $('results');
-  activeOption = -1;
-  $('q').setAttribute('aria-expanded', 'true');
-  $('q').removeAttribute('aria-activedescendant');
-  if (!items.length) {
-    box.hidden = false;
-    box.innerHTML = '<p class="help" role="status">No skill with prerequisites matches. Try a subject name or a shorter word.</p>';
-    return;
-  }
-  box.hidden = false;
-  box.innerHTML = items.map((topic, index) => (
-    `<button type="button" role="option" id="opt-${index}" data-id="${esc(topic.i)}" aria-selected="false">${esc(topic.n)}<small>${esc(SUBJECTS[topic.si].n)} · ${esc(topic.d)} · ${esc(age(topic))}</small></button>`
-  )).join('');
-}
-function searchTopics(query) {
-  const needle = query.trim().toLowerCase();
-  if (needle.length < 2) return [];
-  return summaries.filter((topic) => {
-    if (!topic.mask) return false;
-    if (subjectFilter && SUBJECTS[topic.si].c !== subjectFilter) return false;
-    const subject = SUBJECTS[topic.si];
-    const hay = `${topic.n} ${topic.d} ${subject.n} ${subject.a.join(' ')}`.toLowerCase();
-    return hay.includes(needle);
-  }).sort((a, b) => {
-    const aStart = a.n.toLowerCase().startsWith(needle) ? 1 : 0;
-    const bStart = b.n.toLowerCase().startsWith(needle) ? 1 : 0;
-    return bStart - aStart || b.c - a.c;
-  }).slice(0, 12);
-}
-function moveOption(step) {
-  const options = [...$('results').querySelectorAll('[role="option"]')];
-  if (!options.length) return;
-  activeOption = (activeOption + step + options.length) % options.length;
-  options.forEach((option, index) => option.setAttribute('aria-selected', String(index === activeOption)));
-  $('q').setAttribute('aria-activedescendant', options[activeOption].id);
-  options[activeOption].scrollIntoView({ block: 'nearest' });
-}
 function choose(id, moveFocus) {
   if (!byId.has(id)) return;
   target = id;
-  $('q').value = byId.get(id).n;
-  closeResults();
-  renderStarters();
+  renderSkillList();
   showPath(moveFocus);
 }
 
@@ -655,56 +663,52 @@ $('import-file').addEventListener('change', async () => {
   announce(`Imported ${incoming.length} students. Marks stay in this browser.${skipped ? ` ${skipped} skipped because the name was not a first name or initials.` : ''}`);
 });
 
-document.querySelectorAll('#subject-board, #subject-more').forEach((host) => {
-  host.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-subject]');
-    if (!button) return;
-    subjectFilter = subjectFilter === button.dataset.subject ? '' : button.dataset.subject;
-    renderSubjects();
-    renderStarters();
-    const query = $('q').value.trim();
-    if (query.length >= 2) renderResults(searchTopics(query));
-    else closeResults();
-  });
+$('subject-board').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-subject]');
+  if (!button) return;
+  subjectFilter = subjectFilter === button.dataset.subject ? '' : button.dataset.subject;
+  applyFilters(true);
 });
-$('starters').addEventListener('click', (event) => {
+$('domain-filter').addEventListener('change', () => {
+  domainFilter = $('domain-filter').value;
+  applyFilters(true);
+});
+$('age-filter').addEventListener('change', () => {
+  ageFilter = $('age-filter').value;
+  applyFilters(true);
+});
+$('skill-list').addEventListener('click', (event) => {
   const button = event.target.closest('[data-pick]');
   if (button) choose(button.dataset.pick, true);
 });
-$('q').addEventListener('input', () => {
-  renderStarters();
-  const query = $('q').value.trim();
-  if (query.length < 2) { closeResults(); return; }
-  renderResults(searchTopics(query));
-});
-$('q').addEventListener('keydown', (event) => {
-  if (event.key === 'ArrowDown') { event.preventDefault(); moveOption(1); }
-  else if (event.key === 'ArrowUp') { event.preventDefault(); moveOption(-1); }
-  else if (event.key === 'Escape') closeResults();
-  else if (event.key === 'Enter') {
-    const options = [...$('results').querySelectorAll('[role="option"]')];
-    if (!options.length) return;
-    event.preventDefault();
-    const chosen = options[activeOption] || options[0];
-    choose(chosen.dataset.id, true);
-  }
-});
-$('search-form').addEventListener('submit', (event) => event.preventDefault());
-$('results').addEventListener('click', (event) => {
-  const button = event.target.closest('[data-id]');
-  if (button) choose(button.dataset.id, true);
-});
-$('results').addEventListener('pointerover', (event) => {
-  const button = event.target.closest('[data-id]');
+$('skill-list').addEventListener('pointerover', (event) => {
+  const button = event.target.closest('[data-pick]');
   if (!button) return;
-  const summary = byId.get(button.dataset.id);
+  const summary = byId.get(button.dataset.pick);
   if (!summary) return;
   const codes = new Set(codesFromMask(summary.mask));
   codes.add(SUBJECTS[summary.si].c);
   codes.forEach((code) => { loadSubject(code).catch(() => {}); });
 });
-document.addEventListener('click', (event) => {
-  if (!event.target.closest('.find')) closeResults();
+$('q').addEventListener('input', () => {
+  renderSkillList();
+});
+$('q').addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') return;
+  const button = $('skill-list').querySelector('.skill-pick');
+  if (!button) return;
+  event.preventDefault();
+  choose(button.dataset.pick, true);
+});
+$('search-form').addEventListener('submit', (event) => event.preventDefault());
+$('panel').addEventListener('click', (event) => {
+  const jump = event.target.closest('[data-jump]');
+  if (jump) {
+    jumpTo(jump.dataset.jump);
+    return;
+  }
+  const mark = event.target.closest('[data-mark]');
+  if (mark) setMark(mark.dataset.id, mark.dataset.mark);
 });
 $('path').addEventListener('click', async (event) => {
   const wrong = event.target.closest('.wrong');
@@ -761,8 +765,9 @@ $('link-cancel').addEventListener('click', () => $('link-dialog').close());
 const savedTeacher = loadTeacher();
 if (savedTeacher.name) $('general-teacher').value = savedTeacher.name;
 if (savedTeacher.email) $('general-email').value = savedTeacher.email;
-$('q').value = byId.get(target).n;
+renderAgeOptions();
 renderSubjects();
+renderDomainOptions();
 renderRoster();
-renderStarters();
+renderSkillList();
 showPath(false);

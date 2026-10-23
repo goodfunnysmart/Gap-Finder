@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
   <title>Gap finder · Better Schools</title>
-  <link rel="stylesheet" href="app.css?v=1">
-  <link rel="stylesheet" href="dark.css?v=1">
+  <link rel="stylesheet" href="app.css?v=2">
+  <link rel="stylesheet" href="dark.css?v=2">
   <link rel="preload" href="data/ma.json" as="fetch">
   <link rel="preload" href="data/en.json" as="fetch">
   <script src="theme-init.js?v=1"></script>
@@ -21,7 +21,6 @@
       <img class="logo logo-dark" src="assets/logo-dark.webp" width="692" height="168" alt="Better Schools">
     </div>
     <div class="masthead-tools">
-      <span class="tag">Where to start teaching</span>
       <div class="skin-switch" role="group" aria-label="Appearance">
         <button type="button" data-set-skin="classic" aria-pressed="true">Classic</button>
         <button type="button" data-set-skin="dark" aria-pressed="false">Dark</button>
@@ -32,19 +31,38 @@
 <p id="skin-status" class="sr-only" role="status"></p>
 <p id="live" class="sr-only" role="status"></p>
 <main id="main">
-  <p class="eyebrow">Where to start teaching</p>
-  <h1>Gap finder</h1>
-  <p class="lede">Pick the skill a student is stuck on. This shows the prerequisite path underneath it, from the foundations up to that skill. Mark what is secure, shaky, or not yet, and it points to the earliest gap worth teaching.</p>
-  <div class="notice" role="note"><strong>Starting point, not a diagnosis.</strong> Ages are approximate and the taxonomy is not written for learners with additional needs. Treat the links as a place to begin and use your professional judgement.</div>
+  <div class="title-row">
+    <h1>Gap finder</h1>
+    <details class="how">
+      <summary>How to use</summary>
+      <ol>
+        <li>Pick a subject, then a skill. Mathematics and English have the strongest links.</li>
+        <li>Mark secure, shaky, or not yet. Marks stay in this browser.</li>
+        <li>Teach next is the earliest gap. Check these first are unmarked skills under it.</li>
+      </ol>
+      <p>Starting point, not a diagnosis. Ages are approximate and the taxonomy is not written for learners with additional needs. Use professional judgement.</p>
+      <p>Use a first name or initials only. Do not enter a surname, a class, or a school. The speech icon on a link sends that link only, never a student.</p>
+    </details>
+  </div>
+  <ol class="steps" aria-label="Three steps">
+    <li><b>1</b> Pick a skill</li>
+    <li><b>2</b> Mark what they can do</li>
+    <li><b>3</b> See where to start</li>
+  </ol>
 
   <section class="panel" aria-labelledby="students-heading">
-    <div class="section-heading"><span class="step">01</span><h2 id="students-heading">Students in this browser</h2></div>
-    <p id="student-hint" class="help">Use a first name or initials only. Do not enter a surname, a class code, or a school. Marks stay in this browser and are not uploaded.</p>
+    <div class="section-heading">
+      <h2 id="students-heading">Student</h2>
+      <span class="info-wrap">
+        <button type="button" class="info" aria-describedby="tip-student">i<span class="sr-only"> About names and privacy</span></button>
+        <span id="tip-student" class="tip" role="tooltip">First name or initials only. Marks stay in this browser and are not uploaded.</span>
+      </span>
+    </div>
     <form id="student-form" autocomplete="off">
       <label for="student-name">First name or initials</label>
       <div class="student-add">
-        <input id="student-name" maxlength="24" autocomplete="off" autocapitalize="words" placeholder="e.g. Sam" aria-describedby="student-hint student-error">
-        <button id="add-student" type="submit">Add student</button>
+        <input id="student-name" maxlength="24" autocomplete="off" autocapitalize="words" placeholder="Sam" aria-describedby="tip-student student-error">
+        <button id="add-student" type="submit">Add</button>
       </div>
     </form>
     <p id="student-error" class="form-error" role="status"></p>
@@ -53,32 +71,40 @@
     <div class="toolbar">
       <button id="rename-student" type="button" class="secondary" disabled>Rename</button>
       <button id="remove-student" type="button" class="secondary" disabled>Remove</button>
-      <button id="export-backup" type="button" class="secondary" disabled>Export backup</button>
-      <button id="import-button" type="button" class="secondary">Import backup</button>
+      <button id="export-backup" type="button" class="secondary" disabled title="JSON file on your computer. Includes the Marble credit. Nothing is uploaded.">Export</button>
+      <button id="import-button" type="button" class="secondary">Import</button>
       <input id="import-file" class="sr-only" type="file" accept="application/json,.json" tabindex="-1">
     </div>
-    <p class="help">A backup is a JSON file on your computer. It includes the Marble credit. Nothing in it is sent to the server.</p>
     <p id="save-warning" class="notice" hidden>This browser could not save marks. They will last only until you leave the page.</p>
   </section>
 
   <section class="panel" aria-labelledby="find-heading">
-    <div class="section-heading"><span class="step">02</span><h2 id="find-heading">Choose a skill</h2></div>
-    <p class="subject-lead help">Mathematics and English are the recommended starting points because their prerequisite data is the strongest. The other subjects are here when you need them.</p>
-    <div id="subject-board" class="subject-board"></div>
-    <div id="subject-more" class="subject-more" role="group" aria-label="Other subjects"></div>
-    <p id="subject-status" role="status">Showing all subjects.</p>
+    <div class="section-heading"><span class="step">1</span><h2 id="find-heading">Pick a skill</h2></div>
+    <div id="subject-board" class="subject-board" role="group" aria-label="Subject"></div>
+    <div class="filters">
+      <div>
+        <label for="domain-filter">Domain</label>
+        <select id="domain-filter">
+          <option value="">All domains</option>
+        </select>
+      </div>
+      <div>
+        <label for="age-filter">Age</label>
+        <select id="age-filter"></select>
+      </div>
+    </div>
     <form id="search-form" class="find" role="search" autocomplete="off">
-      <label for="q">Skill the student is stuck on</label>
-      <input id="q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="results" placeholder="Search skills, for example fractions" autocomplete="off">
-      <div id="results" class="results" role="listbox" hidden></div>
+      <label class="sr-only" for="q">Search skills</label>
+      <input id="q" type="search" placeholder="Search skills" autocomplete="off">
     </form>
-    <div id="starters" class="starters"></div>
+    <p id="skill-count" class="skill-count" role="status"></p>
+    <div id="skill-list" class="skill-list"></div>
   </section>
 
   <div class="workspace">
     <section aria-labelledby="path-label">
       <h2 id="path-label" class="sr-only">Prerequisite path</h2>
-      <div id="path"><div class="empty"><p>Loading the prerequisite path…</p></div></div>
+      <div id="path"><div class="empty"><p>Loading skills.</p></div></div>
     </section>
     <aside id="panel" class="panel side" aria-live="polite" aria-labelledby="where-heading">
       <h2 id="where-heading">Where to start</h2>
@@ -87,15 +113,20 @@
   </div>
 
   <section class="panel" aria-labelledby="feedback-heading">
-    <div class="section-heading"><span class="step">03</span><h2 id="feedback-heading">Tell us what to improve</h2></div>
-    <p class="help">Use this for anything that is not a single prerequisite link. Each link also has its own “This link looks wrong” button. Do not name a student, a class, or a school. The note sends the comment, and your name and email only if you add them.</p>
+    <div class="section-heading">
+      <h2 id="feedback-heading">Feedback</h2>
+      <span class="info-wrap">
+        <button type="button" class="info" aria-describedby="tip-feedback">i<span class="sr-only"> What gets sent</span></button>
+        <span id="tip-feedback" class="tip" role="tooltip">No student names. The note includes your comment and, if you add them, your name and email. The speech icon on a link sends that link too.</span>
+      </span>
+    </div>
     <form id="general-form">
       <label for="general-comment">Comment</label>
       <textarea id="general-comment" maxlength="1500" required placeholder="What should we look at?"></textarea>
       <div class="pair-fields">
         <div>
           <label for="general-teacher">Your name <span class="meta">optional</span></label>
-          <input id="general-teacher" maxlength="80" autocomplete="name" placeholder="So we can reply">
+          <input id="general-teacher" maxlength="80" autocomplete="name">
         </div>
         <div>
           <label for="general-email">Your email <span class="meta">optional</span></label>
@@ -107,7 +138,7 @@
         <input id="general-company" tabindex="-1" autocomplete="off">
       </div>
       <div class="dialog-actions">
-        <button id="general-send" class="primary" type="submit">Send feedback</button>
+        <button id="general-send" class="primary" type="submit">Send</button>
       </div>
       <p id="general-status" class="help" role="status"></p>
     </form>
@@ -135,16 +166,16 @@
       </div>
       <div>
         <label for="link-email">Your email <span class="meta">optional</span></label>
-        <input id="link-email" type="email" maxlength="254" autocomplete="email">
+        <input id="link-email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com">
       </div>
     </div>
-    <p class="help">Do not name a student, a class, or a school. The note includes the two skill names and ids, the link, your comment, and your contact details only if you add them.</p>
+    <p class="help">No student, class, or school names.</p>
     <div class="hp" aria-hidden="true">
       <label for="link-company">Company website</label>
       <input id="link-company" tabindex="-1" autocomplete="off">
     </div>
     <div class="dialog-actions">
-      <button id="link-send" class="primary" type="submit">Send feedback</button>
+      <button id="link-send" class="primary" type="submit">Send</button>
       <button id="link-cancel" class="secondary" type="button">Cancel</button>
     </div>
     <p id="link-status" class="help" role="status"></p>
@@ -163,6 +194,7 @@
 <noscript><p class="notice">JavaScript is required to search skills and save marks in this browser.</p></noscript>
 <script id="catalog" type="application/json">__CATALOG__</script>
 <script src="skin.js?v=1" defer></script>
-<script src="app.js?v=1" defer></script>
+<script src="filter.js?v=2" defer></script>
+<script src="app.js?v=2" defer></script>
 </body>
 </html>
