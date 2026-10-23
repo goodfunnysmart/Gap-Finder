@@ -333,7 +333,7 @@ function renderPath() {
       ${links}
     </li>`;
   }).join('');
-  $('path').innerHTML = `<p class="kicker"><span class="step">2</span> Mark what they can do</p>
+  $('path').innerHTML = `<p class="kicker"><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="step">2</span> Mark what they can do</p>
     <h2 id="path-heading" tabindex="-1">${esc(skill.n)}</h2>
     <p class="path-intro">${ids.length} steps · foundations first, target last</p>
     <ul class="legend"><li><span class="swatch s" aria-hidden="true"></span> Secure</li><li><span class="swatch h" aria-hidden="true"></span> Shaky</li><li><span class="swatch n" aria-hidden="true"></span> Not yet</li><li><span class="swatch" aria-hidden="true"></span> Not marked</li></ul>
@@ -381,7 +381,7 @@ function renderPanel(ids, counts) {
   };
   const seg = (count, name) => (count ? `<i class="seg ${name}" style="flex:${count}"></i>` : '');
   const who = active() ? ` · ${esc(active().name)}` : '';
-  let html = `<p class="kicker"><span class="step">3</span> See where to start${who}</p>
+  let html = `<p class="kicker"><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3.5v17M6 5h11.2L14.6 8.6 17.2 12.2H6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span><span class="step">3</span> See where to start${who}</p>
     <h2 id="where-heading">${st(target) === 's' ? 'Target is secure' : 'Where to start'}</h2>
     <p class="count-line">${done} of ${ids.length} secure · ${counts.h} shaky · ${counts.n} not yet · ${counts.u} not marked</p>
     <div class="bar" aria-hidden="true">${seg(counts.s, 'ok')}${seg(counts.h, 'sh')}${seg(counts.n, 'no')}${seg(counts.u, 'rest')}</div>`;

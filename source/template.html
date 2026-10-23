@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
   <title>Gap finder · Better Schools</title>
-  <link rel="stylesheet" href="app.css?v=4">
-  <link rel="stylesheet" href="dark.css?v=4">
+  <link rel="stylesheet" href="app.css?v=5">
+  <link rel="stylesheet" href="dark.css?v=5">
   <link rel="preload" href="data/ma.json" as="fetch">
   <link rel="preload" href="data/en.json" as="fetch">
   <script src="theme-init.js?v=1"></script>
@@ -78,8 +78,8 @@
     <p id="save-warning" class="notice" hidden>This browser could not save marks. They will last only until you leave the page.</p>
   </section>
 
-  <section class="panel" aria-labelledby="find-heading">
-    <div class="section-heading"><span class="step">1</span><h2 id="find-heading">Pick a skill</h2></div>
+  <section class="panel zone-pick" aria-labelledby="find-heading">
+    <div class="section-heading"><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14.8 14.8L20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="step">1</span><h2 id="find-heading">Pick a skill</h2></div>
     <div id="subject-board" class="subject-board" role="group" aria-label="Subject"></div>
     <div class="filters">
       <div>
@@ -102,11 +102,11 @@
   </section>
 
   <div class="workspace">
-    <section aria-labelledby="path-label">
+    <section class="panel zone-mark" aria-labelledby="path-label">
       <h2 id="path-label" class="sr-only">Prerequisite path</h2>
       <div id="path"><div class="empty"><p>Loading skills.</p></div></div>
     </section>
-    <aside id="panel" class="panel side" aria-live="polite" aria-labelledby="where-heading">
+    <aside id="panel" class="panel side zone-start" aria-live="polite" aria-labelledby="where-heading">
       <h2 id="where-heading">Where to start</h2>
       <p>Loading skills.</p>
     </aside>
@@ -195,6 +195,6 @@
 <script id="catalog" type="application/json">__CATALOG__</script>
 <script src="skin.js?v=1" defer></script>
 <script src="filter.js?v=3" defer></script>
-<script src="app.js?v=3" defer></script>
+<script src="app.js?v=4" defer></script>
 </body>
 </html>

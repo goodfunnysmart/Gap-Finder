@@ -72,6 +72,25 @@ html[data-skin="dark"] .skill-pick[aria-current="true"] {
   border-color: #8eafd4;
 }
 html[data-skin="dark"] .kicker .step { background: #e7eef6; color: #042e5e; }
+html[data-skin="dark"] .panel.zone-pick {
+  border-color: #8eafd4;
+  background: #15283f;
+}
+html[data-skin="dark"] .panel.zone-pick .step-icon { color: #d5e4f7; }
+html[data-skin="dark"] .panel.zone-pick .step { background: #e7eef6; color: #042e5e; }
+html[data-skin="dark"] .panel.zone-mark {
+  border-color: #8ee0b0;
+  background: #122620;
+}
+html[data-skin="dark"] .panel.zone-mark .step-icon { color: #8ee0b0; }
+html[data-skin="dark"] .panel.zone-mark .kicker .step { background: #8ee0b0; color: #042e5e; }
+html[data-skin="dark"] .panel.zone-start {
+  border-color: #f0c14a;
+  background: #2a2218;
+  box-shadow: inset 0 0 0 1px #f0c14a, var(--shadow);
+}
+html[data-skin="dark"] .panel.zone-start .step-icon { color: #f0c14a; }
+html[data-skin="dark"] .panel.zone-start .kicker .step { background: #f0c14a; color: #1a1204; }
 html[data-skin="dark"] .steps li.step-pick { background: var(--soft); border-color: #8eafd4; }
 html[data-skin="dark"] .steps li.step-pick .step-icon { color: #d5e4f7; }
 html[data-skin="dark"] .steps li.step-pick b { background: #e7eef6; color: #042e5e; }
