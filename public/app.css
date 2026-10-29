@@ -453,7 +453,49 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   box-shadow: inset 5px 0 0 var(--accent-solid);
   background: var(--soft);
 }
-.skill-name { display: block; font-weight: 600; }
+.curriculum-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 600;
+  font-size: 16px;
+}
+.curriculum-filter input { width: 1.15em; height: 1.15em; flex: 0 0 auto; }
+.skill-card { position: relative; min-width: 0; }
+.skill-card .skill-pick { height: 100%; padding-right: 44px; }
+.ac-codes { flex: 0 0 auto; }
+.row > .ac-codes > summary.info,
+.skill-card .ac-codes > summary.info {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+.skill-card .ac-codes > summary.info { top: 8px; right: 8px; }
+.ac-codes summary.info {
+  min-height: 32px;
+  width: 32px;
+  display: grid;
+  place-items: center;
+  list-style: none;
+}
+.ac-codes summary.info::-webkit-details-marker { display: none; }
+.ac-panel {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 2px solid var(--field-border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+.skill-card .ac-panel { margin: 0 10px 8px; }
+.ac-panel p { margin: 0 0 6px; font-weight: 600; }
+.ac-panel ul { margin: 0; padding-left: 1.1em; }
+.ac-panel code { font-family: ui-monospace, "Segoe UI Mono", monospace; font-size: 13px; }
 .skill-pick small { display: block; color: var(--muted); font-size: 14px; font-weight: 400; }
 #subject-status { font-weight: 600; }
 
@@ -538,6 +580,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 .swatch.h { background: var(--sh-bg); border-color: var(--sh-line); }
 .swatch.n { background: var(--no-bg); border-color: var(--no-line); }
 .row {
+  position: relative;
   background: var(--paper);
   border: 1px solid var(--line);
   border-left: 8px solid #8aa0b8;
@@ -549,7 +592,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 .row.h { border-left-color: var(--sh-line); }
 .row.n { border-left-color: var(--no-line); }
 .row.tgt { border-color: var(--accent-solid); border-left-color: var(--accent-solid); border-width: 2px; border-left-width: 8px; }
-.top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
 .nm { font-weight: 600; }
 .meta { color: var(--muted); font-size: 15px; }
 .target-flag {

@@ -13,8 +13,10 @@ const ATTRIBUTION = Object.assign({
   standards: 'Curriculum standards referenced by the taxonomy have their own upstream licences (see PROVENANCE.md in that repository).',
   note: 'This is a starting point, not a diagnosis. Ages are approximate and the taxonomy is not written for learners with additional needs. Treat prerequisite links as a starting point and use professional judgement.'
 }, catalog.attribution || {});
+const acaraOf = catalog.acara || {};
 const summaries = catalog.topics.map((row) => ({
-  i: row[0], si: row[1], d: row[2], n: row[3], a: row[4], b: row[5], c: row[6], mask: row[7]
+  i: row[0], si: row[1], d: row[2], n: row[3], a: row[4], b: row[5], c: row[6], mask: row[7],
+  ac: acaraOf[row[0]] || []
 }));
 const byId = new Map(summaries.map((topic) => [topic.i, topic]));
 const subjectByCode = new Map(SUBJECTS.map((subject) => [subject.c, subject]));
@@ -37,6 +39,7 @@ let target = byId.has(catalog.default) ? catalog.default : summaries.find((topic
 let subjectFilter = '';
 let domainFilter = '';
 let ageFilter = '';
+let curriculumOnly = false;
 let renaming = false;
 let pathReady = false;
 let showRequest = 0;
@@ -181,11 +184,18 @@ function anc(id, stack) {
   return found;
 }
 
+function curriculumDetail(id, name) {
+  const codes = (byId.get(id) && byId.get(id).ac) || [];
+  if (!codes.length) return '';
+  const items = codes.map((code) => `<li><code>${esc(code)}</code></li>`).join('');
+  return `<details class="ac-codes"><summary class="info">i<span class="sr-only"> Australian Curriculum v9 codes for ${esc(name)}</span></summary><div class="ac-panel" role="region" aria-label="Australian Curriculum v9 codes"><p>Australian Curriculum v9</p><ul>${items}</ul></div></details>`;
+}
 function listFilters(query) {
   return {
     subject: subjectFilter,
     domain: domainFilter,
     age: ageFilter,
+    curriculum: curriculumOnly,
     query: query == null ? $('q').value : query
   };
 }
@@ -250,6 +260,8 @@ function renderSkillList() {
     ? 'Suggested skills'
     : (result.items.length === result.total ? `${result.total} skills` : `Showing ${result.items.length} of ${result.total}`);
   result.items.forEach((topic) => {
+    const card = document.createElement('div');
+    card.className = 'skill-card';
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'skill-pick';
@@ -257,7 +269,9 @@ function renderSkillList() {
     const current = topic.i === target;
     button.setAttribute('aria-current', String(current));
     button.innerHTML = `<span class="skill-name">${esc(topic.n)}</span><small>${esc(SUBJECTS[topic.si].n)} · ${esc(topic.d)} · ${esc(age(topic))}</small>`;
-    host.appendChild(button);
+    card.appendChild(button);
+    if (topic.ac && topic.ac.length) card.insertAdjacentHTML('beforeend', curriculumDetail(topic.i, topic.n));
+    host.appendChild(card);
   });
 }
 function applyFilters(follow) {
@@ -323,6 +337,7 @@ function renderPath() {
     const teachNext = teachSet.has(id);
     return `<li class="row ${mark}${id === target ? ' tgt' : ''}${teachNext ? ' teach-next' : ''}" data-id="${esc(id)}">
       <div class="top"><span class="nm"><span class="step-num">${index + 1}</span>${teachNext ? '<span class="teach-flag">Teach next</span>' : ''}${id === target ? '<span class="target-flag">Target</span>' : ''}${esc(topic.n)}</span><span class="meta">${esc(topic.s)} · ${esc(topic.d)} · ${esc(age(topic))}</span></div>
+      ${curriculumDetail(id, topic.n)}
       <p class="status-word">${STATUS[mark]}</p>
       <div class="st" role="group" aria-label="Status for ${esc(topic.n)}">${[['s', 'Secure'], ['h', 'Shaky'], ['n', 'Not yet']].map(([key, label]) => `<button type="button" data-s="${key}" aria-pressed="${mark === key}">${label}</button>`).join('')}${below}</div>
       <details data-for="${esc(id)}" ${open.has(id) ? 'open' : ''}><summary>Check question</summary>
@@ -683,6 +698,10 @@ $('domain-filter').addEventListener('change', () => {
 });
 $('age-filter').addEventListener('change', () => {
   ageFilter = $('age-filter').value;
+  applyFilters(true);
+});
+$('curriculum-filter').addEventListener('change', () => {
+  curriculumOnly = $('curriculum-filter').checked;
   applyFilters(true);
 });
 $('skill-list').addEventListener('click', (event) => {

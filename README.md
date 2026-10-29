@@ -41,6 +41,8 @@ Gap-Finder/
 
 Mathematics and English are marked as the recommended place to start because their prerequisite data is the strongest. Science, History, Geography, Computing, Personal & Social Development, Life Skills, and Learning to Learn are all available. Mathematics and English load with the page. Other subjects load when a skill needs them.
 
+Skills tagged with Australian Curriculum v9 codes (Marble `standards` entries prefixed `acara-v9:`) keep those codes behind an (i) control. The skill list can be limited to those skills with **Australian Curriculum only**. Other standards on a skill are not shown.
+
 Rebuild after a taxonomy change:
 
 ```bash
