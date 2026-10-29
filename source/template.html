@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
   <title>Gap finder · Better Schools</title>
-  <link rel="stylesheet" href="app.css?v=5">
-  <link rel="stylesheet" href="dark.css?v=5">
+  <link rel="stylesheet" href="app.css?v=6">
+  <link rel="stylesheet" href="dark.css?v=6">
   <link rel="preload" href="data/ma.json" as="fetch">
   <link rel="preload" href="data/en.json" as="fetch">
   <script src="theme-init.js?v=1"></script>
@@ -92,6 +92,10 @@
         <label for="age-filter">Age</label>
         <select id="age-filter"></select>
       </div>
+      <label class="curriculum-filter" for="curriculum-filter">
+        <input id="curriculum-filter" type="checkbox">
+        Australian Curriculum only
+      </label>
     </div>
     <form id="search-form" class="find" role="search" autocomplete="off">
       <label class="sr-only" for="q">Search skills</label>
@@ -194,7 +198,7 @@
 <noscript><p class="notice">JavaScript is required to search skills and save marks in this browser.</p></noscript>
 <script id="catalog" type="application/json">__CATALOG__</script>
 <script src="skin.js?v=1" defer></script>
-<script src="filter.js?v=3" defer></script>
+<script src="filter.js?v=4" defer></script>
 <script src="app.js?v=4" defer></script>
 </body>
 </html>

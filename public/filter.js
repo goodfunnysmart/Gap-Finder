@@ -18,6 +18,7 @@ function skillMatches(topic, subjects, filters) {
   if (!topic || !topic.mask) return false;
   const subject = subjects[topic.si];
   if (!subject) return false;
+  if (filters.curriculum && !(topic.ac && topic.ac.length)) return false;
   if (filters.subject && subject.c !== filters.subject) return false;
   if (filters.domain && topic.d !== filters.domain) return false;
   const band = ageBand(filters.age || '');
@@ -32,7 +33,7 @@ function skillMatches(topic, subjects, filters) {
 
 function filterSkills(topics, subjects, filters, limit, starters) {
   const query = String(filters.query || '').trim().toLowerCase();
-  const browsing = !filters.subject && !filters.domain && !filters.age && query.length < 2;
+  const browsing = !filters.subject && !filters.domain && !filters.age && !filters.curriculum && query.length < 2;
   let matched;
   if (browsing && starters) {
     const byId = new Map(topics.map((topic) => [topic.i, topic]));
@@ -68,7 +69,7 @@ function domainsFor(topics, subjects, subjectCode) {
 // Keep the current skill when it is still in the filtered set.
 // Otherwise follow the first skill the filters now show.
 function pickTarget(currentId, topics, subjects, filters) {
-  const active = !!(filters.subject || filters.domain || filters.age || String(filters.query || '').trim().length >= 2);
+  const active = !!(filters.subject || filters.domain || filters.age || filters.curriculum || String(filters.query || '').trim().length >= 2);
   if (!active) return currentId;
   if (topics.some((topic) => topic.i === currentId && skillMatches(topic, subjects, filters))) return currentId;
   const next = filterSkills(topics, subjects, filters, 1);

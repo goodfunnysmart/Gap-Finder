@@ -12,7 +12,8 @@ assert(match, 'catalog embedded');
 const catalog = JSON.parse(match[1].replace(/<\\\//g, '</'));
 const subjects = catalog.subjects;
 const topics = catalog.topics.map((row) => ({
-  i: row[0], si: row[1], d: row[2], n: row[3], a: row[4], b: row[5], c: row[6], mask: row[7]
+  i: row[0], si: row[1], d: row[2], n: row[3], a: row[4], b: row[5], c: row[6], mask: row[7],
+  ac: (catalog.acara && catalog.acara[row[0]]) || []
 }));
 const fractions = 'mt_-V7EnqU7gG';
 
@@ -66,5 +67,19 @@ const suggested = filterSkills(topics, subjects, { subject: '', domain: '', age:
 assert(suggested.browsing, 'an empty filter shows suggested skills');
 assert(suggested.items.some((topic) => codeOf(topic) === 'ma') && suggested.items.some((topic) => codeOf(topic) === 'en'), 'suggestions start in mathematics and english');
 assert.strictEqual(pickTarget(fractions, topics, subjects, { subject: '', domain: '', age: '', query: '' }), fractions, 'clearing filters keeps the current skill');
+
+const fractionsTopic = topics.find((topic) => topic.i === fractions);
+assert(fractionsTopic.ac.includes('AC9M5N05') && fractionsTopic.ac.includes('AC9M6N05'), 'adding fractions keeps its Australian Curriculum v9 codes');
+assert(!JSON.stringify(catalog.acara).includes('uk-nc') && !JSON.stringify(catalog.acara).includes('ccss'), 'only acara-v9 codes are kept');
+const withoutCurriculum = topics.find((topic) => topic.mask && !topic.ac.length);
+const curriculumOnly = filterSkills(topics, subjects, { subject: '', domain: '', age: '', curriculum: true, query: '' }, 800);
+assert(curriculumOnly.total > 0 && curriculumOnly.total < topics.filter((topic) => topic.mask).length, 'the curriculum filter narrows the list');
+assert(curriculumOnly.items.every((topic) => topic.ac.length), 'every listed skill has an Australian Curriculum code');
+assert(!curriculumOnly.items.some((topic) => topic.i === withoutCurriculum.i), 'a skill without a code is left out');
+assert.notStrictEqual(
+  pickTarget(withoutCurriculum.i, topics, subjects, { subject: '', domain: '', age: '', curriculum: true, query: '' }),
+  withoutCurriculum.i,
+  'the curriculum filter moves the selection onto a tagged skill'
+);
 
 console.log('filter checks passed');

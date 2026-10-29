@@ -177,6 +177,17 @@ def pick_starters(topics: list[dict], counts: dict[str, int], subject: str) -> l
     return picked
 
 
+def acara_codes(topic: dict) -> list[str]:
+    found: list[str] = []
+    for entry in topic.get("standards") or []:
+        if not isinstance(entry, str) or not entry.startswith("acara-v9:"):
+            continue
+        code = entry.split(":", 1)[1].strip()
+        if code and code not in found:
+            found.append(code)
+    return found
+
+
 def compact_topic(topic: dict) -> dict:
     return {
         "i": topic["id"],
@@ -238,6 +249,11 @@ def main() -> None:
             for code, name, recommended in SUBJECTS
         ],
         "starters": starters,
+        "acara": {
+            topic["id"]: acara_codes(topic)
+            for topic in topics
+            if acara_codes(topic)
+        },
         "topics": catalog_topics,
     }
 
